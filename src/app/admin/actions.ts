@@ -67,8 +67,11 @@ export async function updateRound(form: FormData) {
 export async function deleteRound(form: FormData) {
   const supabase = await requireAdmin();
   const id = String(form.get("id"));
-  const { data: goals } = await supabase.from("goals").select("video_path").eq("round_id", id);
-  if (goals?.length) await supabase.storage.from("goal-videos").remove(goals.map((g) => g.video_path));
+  const { data: videos } = await supabase
+    .from("goal_videos")
+    .select("video_path, goals!inner(round_id)")
+    .eq("goals.round_id", id);
+  if (videos?.length) await supabase.storage.from("goal-videos").remove(videos.map((v) => v.video_path));
   await supabase.from("rounds").delete().eq("id", id);
   redirect("/admin");
 }
@@ -80,17 +83,62 @@ export async function addGoal(input: {
   opponent: string | null;
   match_date: string | null;
   description: string | null;
-  video_path: string;
+  video: { label: string; path: string };
 }) {
   const supabase = await requireAdmin();
+  const { video, ...goal } = input;
   const { count } = await supabase
     .from("goals")
     .select("id", { count: "exact", head: true })
-    .eq("round_id", input.round_id);
-  const { error } = await supabase.from("goals").insert({ ...input, sort_order: count ?? 0 });
+    .eq("round_id", goal.round_id);
+  const { data, error } = await supabase
+    .from("goals")
+    .insert({ ...goal, sort_order: count ?? 0 })
+    .select("id")
+    .single();
+  if (error) return error.message;
+  const { error: vErr } = await supabase
+    .from("goal_videos")
+    .insert({ goal_id: data.id, label: video.label, video_path: video.path });
+  if (vErr) {
+    await supabase.from("goals").delete().eq("id", data.id);
+    return vErr.message;
+  }
+  revalidatePath(`/admin/rondes/${goal.round_id}`);
+  return null;
+}
+
+/** Extra camerahoek toevoegen aan een bestaande goal. */
+export async function addGoalVideo(input: { goal_id: string; round_id: string; label: string; path: string }) {
+  const supabase = await requireAdmin();
+  const { count } = await supabase
+    .from("goal_videos")
+    .select("id", { count: "exact", head: true })
+    .eq("goal_id", input.goal_id);
+  const { error } = await supabase
+    .from("goal_videos")
+    .insert({ goal_id: input.goal_id, label: input.label, video_path: input.path, sort_order: count ?? 0 });
   if (error) return error.message;
   revalidatePath(`/admin/rondes/${input.round_id}`);
   return null;
+}
+
+export async function updateGoalVideo(form: FormData) {
+  const supabase = await requireAdmin();
+  await supabase
+    .from("goal_videos")
+    .update({ label: str(form, "label") ?? "Video", sort_order: Number(form.get("sort_order") ?? 0) })
+    .eq("id", String(form.get("id")));
+  revalidatePath(`/admin/rondes/${String(form.get("round_id"))}`);
+}
+
+export async function deleteGoalVideo(form: FormData) {
+  const supabase = await requireAdmin();
+  const id = String(form.get("id"));
+  const { data: video } = await supabase.from("goal_videos").select("video_path").eq("id", id).single();
+  await supabase.from("goal_videos").delete().eq("id", id);
+  if (video) await supabase.storage.from("goal-videos").remove([video.video_path]);
+  revalidatePath(`/admin/rondes/${String(form.get("round_id"))}`);
 }
 
 export async function updateGoal(form: FormData) {
@@ -115,9 +163,9 @@ export async function deleteGoal(form: FormData) {
   const supabase = await requireAdmin();
   const id = String(form.get("id"));
   const roundId = String(form.get("round_id"));
-  const { data: goal } = await supabase.from("goals").select("video_path").eq("id", id).single();
+  const { data: videos } = await supabase.from("goal_videos").select("video_path").eq("goal_id", id);
   await supabase.from("goals").delete().eq("id", id);
-  if (goal) await supabase.storage.from("goal-videos").remove([goal.video_path]);
+  if (videos?.length) await supabase.storage.from("goal-videos").remove(videos.map((v) => v.video_path));
   revalidatePath(`/admin/rondes/${roundId}`);
 }
 

@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { deleteGoal, deleteRound, setWinner, updateGoal, updateRound } from "@/app/admin/actions";
-import { isoToAmsterdamLocal, phaseLabel, roundPhase, videoUrl } from "@/lib/rounds";
-import { UploadGoal } from "@/components/UploadGoal";
+import { deleteGoal, deleteGoalVideo, deleteRound, setWinner, updateGoal, updateGoalVideo, updateRound } from "@/app/admin/actions";
+import { isoToAmsterdamLocal, phaseLabel, roundPhase } from "@/lib/rounds";
+import { AddAngle, UploadGoal } from "@/components/UploadGoal";
+import { GoalPlayer } from "@/components/GoalPlayer";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import type { Goal, ResultRow, Round } from "@/lib/types";
 
@@ -14,7 +15,7 @@ export default async function RoundAdmin({ params }: { params: Promise<{ id: str
   if (!round) notFound();
 
   const [{ data: goals }, { data: results }] = await Promise.all([
-    supabase.from("goals").select("*").eq("round_id", id).order("sort_order").order("created_at").returns<Goal[]>(),
+    supabase.from("goals").select("*, goal_videos(*)").eq("round_id", id).order("sort_order").order("created_at").returns<Goal[]>(),
     supabase.rpc("round_results", { p_round: id }) as unknown as Promise<{ data: ResultRow[] | null }>,
   ]);
   const phase = roundPhase(round);
@@ -117,18 +118,48 @@ export default async function RoundAdmin({ params }: { params: Promise<{ id: str
         <section>
           <h2 className="font-display mb-4 text-2xl">Genomineerde goals ({goals?.length ?? 0})</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {goals?.map((g) => (
-              <div key={g.id} className="flex gap-3 rounded-xl bg-card p-3">
-                <video src={`${videoUrl(g.video_path)}#t=0.1`} controls playsInline preload="metadata"
-                  className="aspect-[9/16] w-28 shrink-0 rounded-lg bg-black object-cover" />
-                <div className="flex-1 space-y-2">
-                  <form action={updateGoal} className="space-y-2">
+            {goals?.map((g) => {
+              const videos = [...g.goal_videos].sort((a, b) => a.sort_order - b.sort_order);
+              return (
+                <div key={g.id} className="space-y-4 rounded-xl bg-card p-3">
+                  <GoalPlayer goal={g} />
+
+                  {/* Camerahoeken */}
+                  <div className="space-y-2">
+                    <p className="label !mb-0">Camerahoeken ({videos.length})</p>
+                    {videos.map((v) => (
+                      <div key={v.id} className="flex items-center gap-2">
+                        <form action={updateGoalVideo} className="flex flex-1 items-center gap-2">
+                          <input type="hidden" name="id" value={v.id} />
+                          <input type="hidden" name="round_id" value={round.id} />
+                          <input name="label" defaultValue={v.label} required className="input !py-1 text-sm" aria-label="Naam camerahoek" />
+                          <input name="sort_order" type="number" defaultValue={v.sort_order} className="input !w-14 !py-1 text-sm" aria-label="Volgorde" />
+                          <button className="btn-ghost !px-2 !py-1 text-xs">Opslaan</button>
+                        </form>
+                        {videos.length > 1 && (
+                          <form action={deleteGoalVideo}>
+                            <input type="hidden" name="id" value={v.id} />
+                            <input type="hidden" name="round_id" value={round.id} />
+                            <ConfirmButton className="text-xs text-red-300 hover:underline" message={`Camerahoek "${v.label}" verwijderen?`}>
+                              ✕
+                            </ConfirmButton>
+                          </form>
+                        )}
+                      </div>
+                    ))}
+                    <AddAngle roundId={round.id} goalId={g.id} />
+                  </div>
+
+                  {/* Gegevens */}
+                  <form action={updateGoal} className="space-y-2 border-t border-white/10 pt-3">
                     <input type="hidden" name="id" value={g.id} />
                     <input type="hidden" name="round_id" value={round.id} />
                     <input name="player_name" defaultValue={g.player_name} required className="input !py-1.5 text-sm" placeholder="Speler" />
-                    <input name="team" defaultValue={g.team ?? ""} className="input !py-1.5 text-sm" placeholder="Team" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input name="team" defaultValue={g.team ?? ""} className="input !py-1.5 text-sm" placeholder="Team" />
+                      <input name="match_date" type="date" defaultValue={g.match_date ?? ""} className="input !py-1.5 text-sm" />
+                    </div>
                     <input name="opponent" defaultValue={g.opponent ?? ""} className="input !py-1.5 text-sm" placeholder="Tegenstander" />
-                    <input name="match_date" type="date" defaultValue={g.match_date ?? ""} className="input !py-1.5 text-sm" />
                     <input name="description" defaultValue={g.description ?? ""} className="input !py-1.5 text-sm" placeholder="Omschrijving" />
                     <div className="flex items-center gap-2">
                       <label className="text-xs text-muted" htmlFor={`so-${g.id}`}>Volgorde</label>
@@ -140,13 +171,13 @@ export default async function RoundAdmin({ params }: { params: Promise<{ id: str
                     <input type="hidden" name="id" value={g.id} />
                     <input type="hidden" name="round_id" value={round.id} />
                     <ConfirmButton className="text-xs text-red-300 hover:underline"
-                      message={`Goal van ${g.player_name} verwijderen? Stemmen op deze goal vervallen ook.`}>
-                      Verwijderen
+                      message={`Goal van ${g.player_name} verwijderen (met alle camerahoeken)? Stemmen op deze goal vervallen ook.`}>
+                      Goal verwijderen
                     </ConfirmButton>
                   </form>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
         <section className="h-fit rounded-2xl bg-card p-5">

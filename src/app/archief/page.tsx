@@ -9,7 +9,7 @@ export default async function Archive() {
   const supabase = await createClient();
   const { data: rounds } = await supabase
     .from("rounds")
-    .select("*, winner:goals!rounds_winner_fk(*)")
+    .select("*, winner:goals!rounds_winner_fk(*, goal_videos(*))")
     .eq("published", true)
     .not("winner_goal_id", "is", null)
     .order("starts_at", { ascending: false })
@@ -22,7 +22,7 @@ export default async function Archive() {
       {!rounds?.length ? (
         <p className="text-muted">Nog geen winnaars. Stem mee en bepaal wie de eerste wordt!</p>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {rounds.map((r) => (
             <article key={r.id} className="space-y-3 rounded-2xl bg-card p-3">
               <p className="font-caps px-1 text-lg text-orange">🏆 {r.title}</p>

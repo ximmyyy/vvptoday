@@ -45,7 +45,6 @@ create table if not exists public.goals (
   opponent text,             -- bv. "SC Feyenoord"
   match_date date,
   description text,
-  video_path text not null,  -- pad in storage bucket 'goal-videos'
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
@@ -57,6 +56,29 @@ do $$ begin
     add constraint rounds_winner_fk foreign key (winner_goal_id)
     references public.goals (id) on delete set null;
 exception when duplicate_object then null; end $$;
+
+-- ---------- Video's per goal (meerdere camerahoeken) ----------
+create table if not exists public.goal_videos (
+  id uuid primary key default gen_random_uuid(),
+  goal_id uuid not null references public.goals on delete cascade,
+  label text not null default 'Veo',  -- bv. "Veo", "Camera", "Achter de goal"
+  video_path text not null,           -- pad in storage bucket 'goal-videos'
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+create index if not exists goal_videos_goal_idx on public.goal_videos (goal_id);
+alter table public.goal_videos enable row level security;
+
+-- Migratie voor wie de eerste versie van dit schema al had gedraaid:
+-- bestaande goals.video_path verhuizen naar goal_videos.
+do $$ begin
+  if exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'goals' and column_name = 'video_path') then
+    insert into public.goal_videos (goal_id, label, video_path)
+    select id, 'Veo', video_path from public.goals where video_path is not null;
+    alter table public.goals drop column video_path;
+  end if;
+end $$;
 
 -- ---------- Stemmen ----------
 -- Eén rij per e-mailadres per ronde. Een stem telt pas als confirmed_at gevuld is.
@@ -96,6 +118,18 @@ drop policy if exists "admins manage goals" on public.goals;
 create policy "admins manage goals" on public.goals
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "public read goal videos" on public.goal_videos;
+create policy "public read goal videos" on public.goal_videos
+  for select using (
+    public.is_admin()
+    or exists (select 1 from public.goals g join public.rounds r on r.id = g.round_id
+               where g.id = goal_id and r.published)
+  );
+
+drop policy if exists "admins manage goal videos" on public.goal_videos;
+create policy "admins manage goal videos" on public.goal_videos
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
 -- ---------- Uitslag ----------
 -- Supporters zien de aantallen pas als er een winnaar is aangewezen; admins altijd.
 create or replace function public.round_results(p_round uuid)
@@ -118,7 +152,7 @@ $$;
 
 -- ---------- Video-opslag ----------
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('goal-videos', 'goal-videos', true, 52428800,
+values ('goal-videos', 'goal-videos', true, 52428800,  -- 50 MB per bestand (max op gratis plan)
         array['video/mp4', 'video/quicktime', 'video/webm'])
 on conflict (id) do nothing;
 

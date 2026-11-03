@@ -10,15 +10,10 @@ export function VotingGrid({ goals, canVote }: { goals: Goal[]; canVote: boolean
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {goals.map((g, i) => (
           <article key={g.id} className="flex flex-col gap-3 rounded-2xl bg-card p-3">
-            <div className="relative">
-              <span className="absolute left-2 top-2 z-10 rounded-md bg-black/70 px-2 py-0.5 font-caps text-sm text-white backdrop-blur">
-                #{i + 1}
-              </span>
-              <GoalVideo goal={g} />
-            </div>
+            <GoalVideo goal={g} badge={`#${i + 1}`} />
             <div className="flex flex-1 flex-col justify-between gap-3 px-1 pb-1">
               <GoalMeta goal={g} />
               {canVote && (

@@ -10,7 +10,7 @@ export function Results({ goals, results, winnerId }: { goals: Goal[]; results: 
   return (
     <div className="space-y-10">
       {winner && (
-        <section className="grid items-center gap-6 rounded-3xl bg-gradient-to-br from-blue/40 via-card to-orange/20 ring-1 ring-white/10 p-5 sm:grid-cols-[minmax(0,320px)_1fr] sm:p-8">
+        <section className="grid items-center gap-6 rounded-3xl bg-gradient-to-br from-blue/40 via-card to-orange/20 ring-1 ring-white/10 p-5 lg:grid-cols-[minmax(0,1.6fr)_1fr] sm:p-8">
           <GoalVideo goal={winner} />
           <div className="space-y-3">
             <p className="font-caps text-orange text-lg">🏆 Winnaar</p>

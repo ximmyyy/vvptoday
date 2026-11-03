@@ -32,7 +32,7 @@ export default async function Home() {
   const phase = roundPhase(current, now);
   const { data: goals } = await supabase
     .from("goals")
-    .select("*")
+    .select("*, goal_videos(*)")
     .eq("round_id", current.id)
     .order("sort_order")
     .order("created_at")

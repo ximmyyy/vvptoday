@@ -33,7 +33,7 @@ Techniek: Next.js · Supabase (database, login, video-opslag) · Resend (e-mail)
 
 ## Gebruik per maand
 1. Ga naar `/admin` en maak een nieuwe ronde (bv. "Oktober 2026") met een open- en sluitmoment.
-2. Upload de genomineerde goals: staande video's, maximaal 50 MB per stuk.
+2. Upload de genomineerde goals: liggende video's (1920×1080), maximaal 50 MB per bestand. Heb je een goal ook vanaf een andere camera? Klik bij die goal op **+ Camerahoek toevoegen** (bv. "Veo" en "Camera"). Supporters kunnen dan tussen de hoeken wisselen.
 3. Vink **Gepubliceerd** aan, dan staat de ronde live.
 4. Bekijk na sluiting de stemmen in het admin-paneel en klik **Wijs aan als winnaar**. De uitslag wordt dan openbaar.
 
