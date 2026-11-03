@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/* ==========================================================
+   HUISSTIJL – pas hier de clubkleuren aan (hex-codes).
+   ========================================================== */
+:root {
+  --club-primary: #0d2240;   /* hoofdkleur (achtergrond header/hero) */
+  --club-accent: #f2c230;    /* accentkleur (knoppen, highlights)   */
+  --club-accent-ink: #111111;/* tekstkleur óp de accentkleur        */
+  --page-bg: #0a0f17;
+  --card-bg: #121a26;
+  --ink: #f4f6f9;
+  --muted: #9aa7b8;
+}
+
+@theme inline {
+  --color-club: var(--club-primary);
+  --color-accent: var(--club-accent);
+  --color-accent-ink: var(--club-accent-ink);
+  --color-page: var(--page-bg);
+  --color-card: var(--card-bg);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --font-display: var(--font-anton), Impact, "Arial Narrow", sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display { letter-spacing: 0.01em; text-transform: uppercase; }
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-bold transition disabled:opacity-50;
+}
+@utility btn-accent { @apply btn bg-accent text-accent-ink hover:brightness-110; }
+@utility btn-ghost { @apply btn border border-white/20 text-ink hover:bg-white/10; }
+@utility btn-danger { @apply btn bg-red-600 text-white hover:bg-red-500; }
+
+@utility input {
+  @apply w-full rounded-lg border border-white/15 bg-black/30 px-4 py-3 text-ink placeholder:text-muted outline-none focus:border-accent;
+}
+@utility label { @apply mb-1 block text-sm font-semibold text-muted; }
