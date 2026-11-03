@@ -17,7 +17,7 @@ export default async function Archive() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10">
-      <p className="font-display text-accent text-lg">Hall of Fame</p>
+      <p className="font-caps text-orange text-base">Hall of Fame</p>
       <h1 className="font-display mb-8 text-5xl sm:text-7xl">Winnaars</h1>
       {!rounds?.length ? (
         <p className="text-muted">Nog geen winnaars. Stem mee en bepaal wie de eerste wordt!</p>
@@ -25,7 +25,7 @@ export default async function Archive() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {rounds.map((r) => (
             <article key={r.id} className="space-y-3 rounded-2xl bg-card p-3">
-              <p className="font-display px-1 text-xl text-accent">🏆 {r.title}</p>
+              <p className="font-caps px-1 text-lg text-orange">🏆 {r.title}</p>
               <GoalVideo goal={r.winner} />
               <div className="px-1 pb-1"><GoalMeta goal={r.winner} /></div>
             </article>

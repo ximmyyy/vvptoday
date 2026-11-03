@@ -14,7 +14,7 @@ export function VotingGrid({ goals, canVote }: { goals: Goal[]; canVote: boolean
         {goals.map((g, i) => (
           <article key={g.id} className="flex flex-col gap-3 rounded-2xl bg-card p-3">
             <div className="relative">
-              <span className="absolute left-2 top-2 z-10 rounded-md bg-accent px-2 py-0.5 font-display text-sm text-accent-ink">
+              <span className="absolute left-2 top-2 z-10 rounded-md bg-black/70 px-2 py-0.5 font-caps text-sm text-white backdrop-blur">
                 #{i + 1}
               </span>
               <GoalVideo goal={g} />
@@ -57,15 +57,15 @@ function VoteDialog({ goal, onClose }: { goal: Goal; onClose: () => void }) {
         {state.status === "ok" ? (
           <div className="space-y-4 text-center">
             <div className="text-5xl">📩</div>
-            <h2 className="font-display text-3xl">Bijna klaar!</h2>
+            <h2 className="font-display text-4xl">Bijna klaar!</h2>
             <p>{state.message}</p>
             <button className="btn-ghost w-full" onClick={onClose}>Sluiten</button>
           </div>
         ) : (
           <form action={action} className="space-y-4">
             <div>
-              <p className="text-sm text-muted">Je stemt op</p>
-              <h2 className="font-display text-3xl">{goal.player_name}</h2>
+              <p className="font-caps text-sm text-muted">Je stemt op</p>
+              <h2 className="font-display text-4xl">{goal.player_name}</h2>
             </div>
             <input type="hidden" name="goalId" value={goal.id} />
             <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />

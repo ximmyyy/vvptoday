@@ -38,8 +38,8 @@ Techniek: Next.js · Supabase (database, login, video-opslag) · Resend (e-mail)
 4. Bekijk na sluiting de stemmen in het admin-paneel en klik **Wijs aan als winnaar**. De uitslag wordt dan openbaar.
 
 ## Huisstijl aanpassen
-- Kleuren: bovenaan [`src/app/globals.css`](src/app/globals.css) (`--club-primary`, `--club-accent`).
-- Logo: zet `logo.png` in `public/` en vervang de "VVP"-cirkel in [`src/app/layout.tsx`](src/app/layout.tsx).
+- Kleuren: bovenaan [`src/app/globals.css`](src/app/globals.css) (`--club-orange`, `--club-blue`).
+- Logo: vervang [`public/logo.png`](public/logo.png) door een scherpere versie (bij voorkeur vierkant PNG, minimaal 256×256).
 
 ## Lokaal ontwikkelen
 ```bash

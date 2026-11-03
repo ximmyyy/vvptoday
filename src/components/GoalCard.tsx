@@ -19,8 +19,8 @@ export function GoalMeta({ goal }: { goal: Goal }) {
     .join(" · ");
   return (
     <div>
-      <h3 className="font-display text-2xl leading-tight">{goal.player_name}</h3>
-      {sub && <p className="text-sm text-muted">{sub}</p>}
+      <h3 className="font-display text-3xl">{goal.player_name}</h3>
+      {sub && <p className="font-caps mt-1 text-sm text-muted">{sub}</p>}
       {goal.description && <p className="mt-1 text-sm">{goal.description}</p>}
     </div>
   );

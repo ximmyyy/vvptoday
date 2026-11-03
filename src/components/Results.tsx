@@ -10,10 +10,10 @@ export function Results({ goals, results, winnerId }: { goals: Goal[]; results: 
   return (
     <div className="space-y-10">
       {winner && (
-        <section className="grid items-center gap-6 rounded-3xl bg-gradient-to-br from-club to-card p-5 sm:grid-cols-[minmax(0,320px)_1fr] sm:p-8">
+        <section className="grid items-center gap-6 rounded-3xl bg-gradient-to-br from-blue/40 via-card to-orange/20 ring-1 ring-white/10 p-5 sm:grid-cols-[minmax(0,320px)_1fr] sm:p-8">
           <GoalVideo goal={winner} />
           <div className="space-y-3">
-            <p className="font-display text-accent text-xl">🏆 Winnaar</p>
+            <p className="font-caps text-orange text-lg">🏆 Winnaar</p>
             <GoalMeta goal={winner} />
             <p className="text-muted">
               {Math.round(((counts.get(winner.id) ?? 0) / total) * 100)}% van de stemmen
@@ -22,7 +22,7 @@ export function Results({ goals, results, winnerId }: { goals: Goal[]; results: 
         </section>
       )}
       <section>
-        <h2 className="font-display mb-4 text-2xl">Uitslag</h2>
+        <h2 className="font-display mb-4 text-4xl">Uitslag</h2>
         <ol className="space-y-3">
           {ranked.map((g, i) => {
             const pct = Math.round(((counts.get(g.id) ?? 0) / total) * 100);

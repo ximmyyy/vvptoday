@@ -22,8 +22,8 @@ export default async function Home() {
   if (!current) {
     return (
       <Hero
-        kicker="Goal van de Maand"
-        title="Binnenkort"
+        heading="Binnenkort."
+        line="Goal van de Maand"
         sub={upcoming ? `Stemmen opent op ${formatDateTime(upcoming.starts_at)}.` : "De volgende stemronde wordt binnenkort aangekondigd."}
       />
     );
@@ -43,7 +43,7 @@ export default async function Home() {
     const results = (data ?? []) as ResultRow[];
     return (
       <>
-        <Hero kicker="Goal van de Maand" title={current.title} sub="De stemmen zijn geteld!" />
+        <Hero line={`${current.title} · De stemmen zijn geteld`} sub="Bedankt aan iedereen die heeft gestemd!" />
         <div className="mx-auto max-w-6xl px-4 pb-16">
           <Results goals={goals ?? []} results={results ?? []} winnerId={current.winner_goal_id!} />
         </div>
@@ -54,8 +54,7 @@ export default async function Home() {
   return (
     <>
       <Hero
-        kicker="Stem op de Goal van de Maand"
-        title={current.title}
+        line={`V.V. Pernis · ${current.title}`}
         sub={
           phase === "open"
             ? `Kies jouw favoriet! Stemmen kan tot ${formatDateTime(current.ends_at)}.`
@@ -73,12 +72,19 @@ export default async function Home() {
   );
 }
 
-function Hero({ kicker, title, sub }: { kicker: string; title: string; sub: string }) {
+function Hero({ heading = "Goal van de Maand.", line, sub }: { heading?: string; line: string; sub: string }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
-      <p className="font-display text-accent text-lg">{kicker}</p>
-      <h1 className="font-display text-5xl sm:text-7xl">{title}</h1>
-      <p className="mt-3 max-w-xl text-muted">{sub}</p>
+    <section className="relative overflow-hidden">
+      {/* oranje-blauwe banen zoals op het shirt */}
+      <div aria-hidden className="pointer-events-none absolute -right-24 -top-10 flex h-[140%] rotate-12 gap-3 opacity-60 sm:right-16 sm:opacity-80">
+        <div className="w-6 bg-orange sm:w-10" />
+        <div className="w-6 bg-blue sm:w-10" />
+      </div>
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-20">
+        <h1 className="font-display max-w-3xl text-6xl sm:text-8xl">{heading}</h1>
+        <p className="font-caps mt-4 text-lg sm:text-xl">{line}</p>
+        <p className="mt-2 max-w-xl text-muted">{sub}</p>
+      </div>
     </section>
   );
 }

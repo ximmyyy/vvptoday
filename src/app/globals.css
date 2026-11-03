@@ -1,27 +1,32 @@
 @import "tailwindcss";
 
 /* ==========================================================
-   HUISSTIJL – pas hier de clubkleuren aan (hex-codes).
+   HUISSTIJL VV PERNIS – kleuren uit het clublogo
    ========================================================== */
 :root {
-  --club-primary: #0d2240;   /* hoofdkleur (achtergrond header/hero) */
-  --club-accent: #f2c230;    /* accentkleur (knoppen, highlights)   */
-  --club-accent-ink: #111111;/* tekstkleur óp de accentkleur        */
-  --page-bg: #0a0f17;
-  --card-bg: #121a26;
-  --ink: #f4f6f9;
-  --muted: #9aa7b8;
+  --club-orange: #db7a35;
+  --club-blue: #265ca2;
+  --club-primary: var(--club-blue);
+  --club-accent: var(--club-orange);
+  --club-accent-ink: #ffffff;
+  --page-bg: #0b0c0f;        /* zwart, zoals het uittenue */
+  --card-bg: #15171c;
+  --ink: #f5f5f4;
+  --muted: #a3a6ad;
 }
 
 @theme inline {
   --color-club: var(--club-primary);
+  --color-blue: var(--club-blue);
+  --color-orange: var(--club-orange);
   --color-accent: var(--club-accent);
   --color-accent-ink: var(--club-accent-ink);
   --color-page: var(--page-bg);
   --color-card: var(--card-bg);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
-  --font-display: var(--font-anton), Impact, "Arial Narrow", sans-serif;
+  --font-serif: var(--font-playfair), "Didot", Georgia, serif;
+  --font-caps: var(--font-barlow), "Arial Narrow", sans-serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
@@ -32,7 +37,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.font-display { letter-spacing: 0.01em; text-transform: uppercase; }
+/* "Matchday"-stijl: schuine, smalle schreefletter */
+.font-display {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+/* Onderregels zoals "V.V. PERNIS – V.V. ZUIDLAND" */
+.font-caps {
+  font-family: var(--font-caps);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+/* Oranje-blauwe baan, zoals op het shirt */
+.club-stripe {
+  background: linear-gradient(90deg, var(--club-orange) 0 50%, var(--club-blue) 50% 100%);
+}
 
 @utility btn {
   @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-bold transition disabled:opacity-50;
